@@ -1,114 +1,79 @@
-var Tennis = function () {
+var Tennis = (function () {
+    var translateScore = function (score) {
+        switch (score) {
+            case 0: return "Love";
+            case 1: return "Fifteen";
+            case 2: return "Thirty";
+            case 3: return "Forty";
+        }
+    };
 
-    var getScore, instance, player1Scores, player2Scores,
-        translatePlayerScore, getWinner, hasDeuce, getAdvantage;
+    var Klass = function () {
+        this.playerOneScore = 0;
+        this.playerTwoScore = 0;
 
-    instance = {};
+    };
 
-    instance.player1Score = 0;
-    instance.player2Score = 0;
-
-
-    getScore = function () {
+    Klass.prototype.getScore = function () {
         var winner, advantage;
-
-        winner = getWinner();
-        advantage = getAdvantage();
+        winner = this.getWinner();
 
         if (winner) {
-            return "Winner: " + winner;
+            return winner;
         }
 
-        if (advantage) {
-            return "Advantage: " + advantage;
-        }
-
-        if (hasDeuce()) {
+        if (this.isDeuce()) {
             return "Deuce";
         }
 
-        return translatePlayerScore(instance.player1Score) +
-                ", " + translatePlayerScore(instance.player2Score);
-    };
-    player1Scores = function () {
-        instance.player1Score++;
-    };
-    player2Scores = function () {
-        instance.player2Score++;
-    };
-
-    translatePlayerScore = function (score) {
-        var readableScore = null;
-        switch(score) {
-            case 0:
-                readableScore = "Love";
-                break;
-            case 1:
-                readableScore = "15";
-                break;
-            case 2:
-                readableScore = "30";
-                break;
-            case 3:
-                readableScore = "40";
-                break;
+        advantage = this.getAdvantage();
+        if (advantage) {
+            return advantage;
         }
 
-        return readableScore;
+        return translateScore(this.playerOneScore) +
+            ", " + translateScore(this.playerTwoScore);
     };
 
-    getWinner = function () {
+    Klass.prototype.playerOneScores = function () {
+        this.playerOneScore++;
+    };
 
-        if (instance.player1Score === 3 &&
-            instance.player1Score - 2 >= instance.player2Score) {
-            return "player1";
+    Klass.prototype.playerTwoScores = function () {
+        this.playerTwoScore++;
+    };
+
+    Klass.prototype.getWinner = function () {
+        if( this.playerOneScore >= 3 &&
+            this.playerOneScore >= this.playerTwoScore + 2) {
+            return "Winner: playerOne";
         }
 
-        if (instance.player2Score === 3 &&
-            instance.player2Score - 2 >= instance.player1Score) {
-            return "player2";
+        if( this.playerTwoScore >= 3 &&
+            this.playerTwoScore >= this.playerOneScore + 2) {
+            return "Winner: playerTwo";
+        }
+    };
+
+    Klass.prototype.isDeuce = function () {
+        return this.playerOneScore === this.playerTwoScore &&
+                this.playerOneScore >= 3;
+    };
+
+    Klass.prototype.getAdvantage = function () {
+        if (this.playerOneScore === this.playerTwoScore + 1 &&
+            this.playerOneScore >= 4 ) {
+            return "Advantage: playerOne";
         }
 
-        return undefined;
-    };
-
-    getAdvantage = function () {
-        if (instance.player1Score >= 3 &&
-            instance.player2Score >= 3) {
-
-            if (instance.player1Score - 1 === instance.player2Score) {
-                return "player1";
-            }
-            if (instance.player2Score - 1 === instance.player1Score) {
-                return "player2";
-            }
+        if (this.playerTwoScore === this.playerOneScore + 1 &&
+            this.playerTwoScore >= 4 ) {
+            return "Advantage: playerTwo";
         }
 
-        return undefined;
     };
 
-    hasDeuce = function () {
-        if (instance.player1Score === instance.player2Score &&
-            instance.player1Score >= 3 &&
-            instance.player2Score >= 3) {
+    return Klass;
+}());
 
-            return true;
-        }
-
-        return false;
-    };
-
-
-
-
-
-    return {
-        getScore: getScore,
-        player1Scores: player1Scores,
-        player2Scores: player2Scores
-    };
-};
-
-module.exports = {
-    new: Tennis
-};
+module.exports = Tennis;

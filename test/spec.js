@@ -5,139 +5,194 @@ var expect = chai.expect;
 
 var Tennis = require('../main.js');
 
-describe('Tennis game kata:', function () {
+describe('Tennis game', function () {
+
     before(function () {
-        this.tennis = Tennis.new();
+       this.tennis = new Tennis;
     });
 
-    it('defines tennis object', function () {
+    it('should define Tennis class', function () {
        expect(this.tennis).to.exist;
     });
 
-    it('exposes getScore method', function () {
+    it('should define Tennis#getScore method', function () {
        expect(this.tennis).to.respondTo('getScore');
     });
 
-    it('should expose methods for player scoring', function () {
-        expect(this.tennis).to.respondTo('player1Scores');
-        expect(this.tennis).to.respondTo('player2Scores');
+    it('should define score method for each player', function () {
+       expect(this.tennis).to.respondTo('playerOneScores');
+       expect(this.tennis).to.respondTo('playerTwoScores');
+    });
+
+    it('should hold playerOne score as a variable', function () {
+       expect(this.tennis.playerOneScore).to.be.equal(0);
+    });
+
+    it('should hold playerTwo score as a variable', function () {
+        expect(this.tennis.playerTwoScore).to.be.equal(0);
     });
 
 
-    describe('Simple Scores', function () {
+    describe('basic scoring', function () {
         beforeEach(function () {
-           this.tennis = Tennis.new();
+           this.tennis = new Tennis;
         });
 
-        it('before any player scored the score should be "Love, Love"', function () {
-           expect(this.tennis.getScore()).to.equal("Love, Love");
+        it('should add point when playerOne scores', function () {
+           this.tennis.playerOneScores();
+            expect(this.tennis.playerOneScore).to.be.equal(1);
         });
 
-        it('after player1 scores, the score should say "15, Love"', function () {
-            this.tennis.player1Scores();
-            expect(this.tennis.getScore()).to.equal("15, Love");
-        });
-
-        it('after player1 scores twice the score should be "30, Love', function () {
-            this.tennis.player1Scores();
-            this.tennis.player1Scores();
-            expect(this.tennis.getScore()).to.equal("30, Love");
-        });
-
-        it('should work the same for player2', function () {
-            expect(this.tennis.getScore()).to.equal("Love, Love");
-            this.tennis.player2Scores();
-            expect(this.tennis.getScore()).to.equal("Love, 15");
-            this.tennis.player2Scores();
-            expect(this.tennis.getScore()).to.equal("Love, 30");
+        it('should add point when playerTwo scores', function () {
+            this.tennis.playerTwoScores();
+            expect(this.tennis.playerTwoScore).to.be.equal(1);
         });
     });
 
-    describe('Winning:', function () {
+    describe('#getScore', function () {
         beforeEach(function () {
-           this.tennis = Tennis.new();
+            this.tennis = new Tennis;
         });
 
-
-        it('if player1 has 40 points he should be declared a winner', function () {
-            for(var i = 0; i < 3; i++) {
-               this.tennis.player1Scores();
-            }
-
-            expect(this.tennis.getScore()).to.equal('Winner: player1');
+        it('displays "Love, Love" when no player scored', function () {
+            expect(this.tennis.getScore()).to.equal('Love, Love');
         });
 
-        it('if player2 has 40 points he should be declared a winner', function () {
-            for(var i = 0; i < 3; i++) {
-                this.tennis.player2Scores();
-            }
+        it('displays "Fifteen, Love" when playerOne has scored once', function () {
+            this.tennis.playerOneScores();
+            expect(this.tennis.getScore()).to.equal('Fifteen, Love');
 
-            expect(this.tennis.getScore()).to.equal('Winner: player2');
         });
 
+        it('displays "Thirty, Love" when playerOne has 2 points', function () {
+            this.tennis.playerOneScores();
+            this.tennis.playerOneScores();
+            expect(this.tennis.getScore()).to.equal('Thirty, Love');
 
-        it('winner shouldnt be declared if his advantage is less than 2 points', function () {
-            for(var i = 0; i < 3; i++) {
-                this.tennis.player2Scores();
-            }
-
-            for(var j = 0; j < 2; j++) {
-                this.tennis.player1Scores();
-            }
-
-            expect(this.tennis.getScore()).to.equal('30, 40');
         });
 
+        it('displays "Forty, Thirty" when score is 3:2', function () {
+            this.tennis.playerOneScore = 3;
+            this.tennis.playerTwoScore = 2;
+            expect(this.tennis.getScore()).to.equal('Forty, Thirty');
+        });
+
+        it('displays "Winner: playerTwo" when score is 4:6', function () {
+
+            this.tennis.playerOneScore = 4;
+            this.tennis.playerTwoScore = 6;
+
+            expect(this.tennis.getScore()).to.be.equal("Winner: playerTwo");
+        });
+
+        it('displays "Deuce" when both players have the same score', function () {
+            this.tennis.playerOneScore = 4;
+            this.tennis.playerTwoScore = 4;
+
+            expect(this.tennis.getScore()).to.be.equal("Deuce");
+        });
+
+        it('displays "Advantage: playerOne" when playerOne leads by one point', function () {
+            this.tennis.playerOneScore = 9;
+            this.tennis.playerTwoScore = 8;
+
+            expect(this.tennis.getScore()).to.equal("Advantage: playerOne");
+        });
     });
 
-    describe('Deuce', function () {
+    describe('#getWinner', function () {
         beforeEach(function () {
-            this.tennis = Tennis.new();
+            this.tennis = new Tennis;
         });
 
-        it('result of getScore should be "Deuce" when both players have score of 40', function () {
-            for(var i = 0; i < 3; i++) {
-                this.tennis.player1Scores();
-                this.tennis.player2Scores();
-            }
+        it('returns "Winner: playerOne" when score is 3:0', function () {
 
-            expect(this.tennis.getScore()).to.equal("Deuce");
+            this.tennis.playerOneScore = 3;
+            this.tennis.playerTwoScore = 0;
+
+            expect(this.tennis.getWinner()).to.be.equal("Winner: playerOne");
         });
 
-        it('result of getScore should be "Deuce" when both players have equal score of more than 40', function () {
-            for(var i = 0; i < 10; i++) {
-                this.tennis.player1Scores();
-                this.tennis.player2Scores();
-            }
+        it('returns "Winner: playerTwo" when score is 0:3', function () {
 
-            expect(this.tennis.getScore()).to.equal("Deuce");
+            this.tennis.playerOneScore = 0;
+            this.tennis.playerTwoScore = 3;
+
+            expect(this.tennis.getWinner()).to.be.equal("Winner: playerTwo");
         });
+
+        it('returns "Winner: playerTwo" when score is 4:6', function () {
+
+            this.tennis.playerOneScore = 4;
+            this.tennis.playerTwoScore = 6;
+
+            expect(this.tennis.getWinner()).to.be.equal("Winner: playerTwo");
+        });
+
     });
 
-    describe('Advantage', function () {
+    describe('#isDeuce', function () {
         beforeEach(function () {
-            this.tennis = Tennis.new();
+            this.tennis = new Tennis;
         });
 
-        it('getScore should return "Advantage: player1" when both players have scored at least 3 times and one of them leads by 1 point', function () {
-            for(var i = 0; i < 3; i++) {
-                this.tennis.player1Scores();
-                this.tennis.player2Scores();
-            }
-            this.tennis.player1Scores();
+        it('returns true if both players have same score (equal 3)', function () {
+            this.tennis.playerOneScore = 3;
+            this.tennis.playerTwoScore = 3;
 
-            expect(this.tennis.getScore()).to.equal('Advantage: player1');
+            expect(this.tennis.isDeuce()).to.equal(true);
         });
 
-        it('getScore should return "Advantage: player1" when both players have scored at least 3 times and one of them leads by 1 point', function () {
-            for(var i = 0; i < 3; i++) {
-                this.tennis.player1Scores();
-                this.tennis.player2Scores();
-            }
-            this.tennis.player2Scores();
+        it('returns true if both players have same score (above 3)', function () {
+            this.tennis.playerOneScore = 6;
+            this.tennis.playerTwoScore = 6;
 
-            expect(this.tennis.getScore()).to.equal('Advantage: player2');
+            expect(this.tennis.isDeuce()).to.equal(true);
         });
+
+        it('returns false when players have the same score but it\'s lower than 3', function (){
+           expect(this.tennis.isDeuce()).to.equal(false);
+        });
+
+        it('returns false when players have different scores', function () {
+            this.tennis.playerOneScore = 1;
+            this.tennis.playerTwoScore = 2;
+
+            expect(this.tennis.isDeuce()).to.equal(false);
+        })
     });
+
+    describe("#getAdvantage", function () {
+        beforeEach(function () {
+            this.tennis = new Tennis;
+        });
+
+        it('should be defined', function () {
+           expect(this.tennis).to.respondTo('getAdvantage');
+        });
+
+        it('should return "Advantage: playerOne" when player leads by one point over 3', function () {
+            this.tennis.playerOneScore = 4;
+            this.tennis.playerTwoScore = 3;
+
+            expect(this.tennis.getAdvantage()).to.equal("Advantage: playerOne");
+        });
+
+        it('should return "Advantage: playerTwo" when playerTwo leads by one point over 3', function () {
+            this.tennis.playerOneScore = 3;
+            this.tennis.playerTwoScore = 4;
+
+            expect(this.tennis.getAdvantage()).to.equal("Advantage: playerTwo");
+        });
+
+        it('should return "Advantage: playerOne" when playerOne leads by one point', function () {
+            this.tennis.playerOneScore = 9;
+            this.tennis.playerTwoScore = 8;
+
+            expect(this.tennis.getAdvantage()).to.equal("Advantage: playerOne");
+        });
+
+    });
+
 
 });
