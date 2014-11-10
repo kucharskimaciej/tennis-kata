@@ -1,0 +1,15 @@
+{
+  "name": "TennisKata",
+  "version": "0.0.0",
+  "description": "App template for tennis kata",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --watch -R spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^1.9.2",
+    "mocha": "^2.0.1"
+  }
+}
